@@ -22,6 +22,7 @@ HIGHLIGHT_CSS = """
     border: 1px solid #ddd;
     border-radius: 8px;
     background: #fafafa;
+    color: #1a1a1a;
     max-height: 600px;
     overflow-y: auto;
 }
@@ -33,6 +34,7 @@ HIGHLIGHT_CSS = """
     position: relative;
     border-bottom: 2px solid transparent;
     transition: all 0.2s ease;
+    color: #111;
 }
 
 .trap-highlight:hover {
