@@ -1,4 +1,7 @@
-﻿# TrapDetect
+# TrapDetect
+
+[中文](README.md) | [English](README-EN.md)
+
 
 逻辑陷阱透视镜（TrapDetect）是一个基于 Streamlit + Gemini 的文本分析工具，用于自动识别合同/条款/营销文案中的逻辑陷阱与风险点，并以高亮与关系拓扑图的方式可视化展示。
 
