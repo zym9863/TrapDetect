@@ -11,6 +11,7 @@ from styles import PAGE_CSS
 
 EXAMPLES_DIR = Path(__file__).parent / "examples"
 TEXT_INPUT_KEY = "input_text"
+PRELOAD_KEY = "_preload_text"
 
 
 def load_example(name: str) -> str:
@@ -89,7 +90,7 @@ def main() -> None:
                 label_visibility="collapsed",
             )
             if selected_example != "—" and st.button("LOAD", use_container_width=True):
-                st.session_state[TEXT_INPUT_KEY] = load_example(
+                st.session_state[PRELOAD_KEY] = load_example(
                     f"{selected_example}.txt"
                 )
                 st.rerun()
@@ -123,19 +124,27 @@ def main() -> None:
         type=["txt"],
         help="Only .txt files are supported.",
     )
+
+    # Read uploaded file content (if any) for later use
+    uploaded_text = ""
     if uploaded is not None:
-        input_text = uploaded.read().decode("utf-8")
-        st.session_state[TEXT_INPUT_KEY] = input_text
-        st.rerun()
+        uploaded_text = uploaded.read().decode("utf-8")
+
+    # If example text was preloaded, use it as default value
+    preload_value = st.session_state.pop(PRELOAD_KEY, None)
+    default_text = preload_value if preload_value else st.session_state.get(TEXT_INPUT_KEY, "")
 
     # Text input
     input_text = st.text_area(
         "Paste or type text",
-        value=st.session_state.get(TEXT_INPUT_KEY, ""),
+        value=default_text,
         height=220,
         placeholder="Paste the message to analyze. You can also load a sample or upload a .txt file.",
-        key=TEXT_INPUT_KEY,
     )
+
+    # Uploaded file takes priority over text area content
+    if uploaded_text:
+        input_text = uploaded_text
 
     col1, col2 = st.columns([1, 5])
     with col1:
