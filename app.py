@@ -10,6 +10,7 @@ from models import AnalysisResult
 from styles import PAGE_CSS
 
 EXAMPLES_DIR = Path(__file__).parent / "examples"
+TEXT_INPUT_KEY = "input_text"
 
 
 def load_example(name: str) -> str:
@@ -55,7 +56,7 @@ def main() -> None:
                 options=["（不使用示例）"] + example_names,
             )
             if selected_example != "（不使用示例）" and st.button("加载示例"):
-                st.session_state["input_text"] = load_example(
+                st.session_state[TEXT_INPUT_KEY] = load_example(
                     f"{selected_example}.txt"
                 )
                 st.rerun()
@@ -71,10 +72,10 @@ def main() -> None:
     # 文本输入
     input_text = st.text_area(
         "待分析文本",
-        value=st.session_state.get("input_text", ""),
+        value=st.session_state.get(TEXT_INPUT_KEY, ""),
         height=250,
         placeholder="在此粘贴待分析的文本...",
-        key="text_input_area",
+        key=TEXT_INPUT_KEY,
     )
 
     # 文件上传
@@ -85,6 +86,7 @@ def main() -> None:
     )
     if uploaded is not None:
         input_text = uploaded.read().decode("utf-8")
+        st.session_state[TEXT_INPUT_KEY] = input_text
 
     # 分析按钮
     col1, col2 = st.columns([1, 5])

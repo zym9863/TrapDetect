@@ -13,7 +13,7 @@ def analyze_text(text: str, api_key: str) -> AnalysisResult:
 
     prompt = build_analysis_prompt(text)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-3-flash-preview",
         contents=prompt,
     )
 
