@@ -84,7 +84,7 @@ def render_topology(result: AnalysisResult) -> None:
     selected = streamlit_flow(
         key="trap_topology",
         state=state,
-        layout=ForceLayout(animated=True),
+        layout=ForceLayout(),
         height=500,
         fit_view=True,
         show_controls=True,
