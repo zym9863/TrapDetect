@@ -162,7 +162,7 @@ PAGE_CSS = """
 }
 
 /* 全局字体 */
-.stApp, .stApp p, .stApp span, .stApp div, .stApp li {
+.stApp, .stApp p, .stApp span:not([translate="no"]), .stApp div, .stApp li {
     font-family: 'Noto Sans SC', -apple-system, sans-serif !important;
 }
 
@@ -553,6 +553,54 @@ h1, h2, h3, h4, h5, h6,
 
 [data-testid="stExpander"] details[open] {
     border-color: rgba(0, 229, 255, 0.12) !important;
+}
+
+/* ── 修复 Expander 展开/收起箭头图标渲染 ── */
+/* Streamlit 使用 Material Symbols 渲染箭头，全局字体覆盖会破坏 ligature */
+[data-testid="stExpander"] summary span[data-testid],
+[data-testid="stExpander"] summary > span:first-child,
+[data-testid="stExpanderToggleDetails"] > span:first-child,
+[data-testid="stExpander"] details summary svg,
+[data-testid="stExpander"] details > summary > span[translate="no"] {
+    font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Icons', sans-serif !important;
+    font-variant-ligatures: normal !important;
+    font-feature-settings: "liga" !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+    width: 1.2em !important;
+    font-size: 1.2rem !important;
+}
+
+/* 确保 Expander summary 使用 flex 布局防止文字重叠 */
+[data-testid="stExpander"] details > summary,
+[data-testid="stExpanderToggleDetails"] {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    overflow: hidden !important;
+    font-family: 'Noto Sans SC', sans-serif !important;
+    font-size: 0.88rem !important;
+    color: #c8d6e5 !important;
+    padding: 0.75rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-testid="stExpander"] details > summary:hover,
+[data-testid="stExpanderToggleDetails"]:hover {
+    background: rgba(0, 229, 255, 0.03) !important;
+}
+
+/* Expander 标签文字：自动截断防止溢出重叠 */
+[data-testid="stExpander"] details > summary > span:last-child,
+[data-testid="stExpanderToggleDetails"] > span:last-child,
+[data-testid="stExpander"] details > summary p,
+[data-testid="stExpander"] .st-emotion-cache-p5msec p {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    flex: 1 !important;
+    min-width: 0 !important;
 }
 
 /* ═══════════════════════════════════════════
