@@ -137,7 +137,7 @@ HIGHLIGHT_CSS = """
 # ── 全局页面样式 ──
 PAGE_CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&display=swap');
 
 /* ═══════════════════════════════════════════
    全局基础
@@ -164,6 +164,27 @@ PAGE_CSS = """
 /* 全局字体 */
 .stApp, .stApp p, .stApp span, .stApp div, .stApp li {
     font-family: 'Noto Sans SC', -apple-system, sans-serif !important;
+}
+
+/* Ensure Material icon ligatures render instead of showing raw text like "keyboard_double_arrow_left" */
+.stApp .material-symbols-rounded,
+.stApp .material-symbols-outlined,
+.stApp .material-symbols-sharp,
+.stApp .material-icons,
+.stApp [class*="material-symbols-"] {
+    font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Symbols Sharp', 'Material Icons', sans-serif !important;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    font-variant-ligatures: normal;
+    font-feature-settings: "liga";
+}
+
+/* Sidebar collapse control sometimes renders as raw ligature text; force icon font there */
+[data-testid="collapsedControl"] span,
+[data-testid="stSidebarCollapseButton"] span,
+[data-testid="stSidebar"] button span[translate="no"] {
+    font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Symbols Sharp', 'Material Icons', sans-serif !important;
+    font-variant-ligatures: normal;
+    font-feature-settings: "liga";
 }
 
 h1, h2, h3, h4, h5, h6,
