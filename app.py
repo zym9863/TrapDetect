@@ -118,26 +118,25 @@ def main() -> None:
         '</div>',
         unsafe_allow_html=True,
     )
-
-    # ── 输入区域 ──
-    input_text = st.text_area(
-        "待分析文本",
-        value=st.session_state.get(TEXT_INPUT_KEY, ""),
-        height=220,
-        placeholder="在此粘贴待分析的文本 — 法律合同、营销文案、协议条款...",
-        key=TEXT_INPUT_KEY,
-    )
-
     uploaded = st.file_uploader(
-        "或上传文本文件",
+        "Upload a text file",
         type=["txt"],
-        help="支持 .txt 格式",
+        help="Only .txt files are supported.",
     )
     if uploaded is not None:
         input_text = uploaded.read().decode("utf-8")
         st.session_state[TEXT_INPUT_KEY] = input_text
+        st.rerun()
 
-    # 分析按钮
+    # Text input
+    input_text = st.text_area(
+        "Paste or type text",
+        value=st.session_state.get(TEXT_INPUT_KEY, ""),
+        height=220,
+        placeholder="Paste the message to analyze. You can also load a sample or upload a .txt file.",
+        key=TEXT_INPUT_KEY,
+    )
+
     col1, col2 = st.columns([1, 5])
     with col1:
         analyze_btn = st.button(
