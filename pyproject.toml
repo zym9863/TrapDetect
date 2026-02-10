@@ -1,7 +1,12 @@
 [project]
 name = "trapdetect"
 version = "0.1.0"
-description = "Add your description here"
+description = "逻辑陷阱透视镜 - 智能识别文本中的逻辑陷阱与风险条款"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "streamlit>=1.40.0",
+    "google-genai>=1.0.0",
+    "pydantic>=2.0.0",
+    "streamlit-flow-component>=1.0.0",
+]
