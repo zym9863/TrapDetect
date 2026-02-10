@@ -9,11 +9,11 @@ from styles import SEVERITY_COLORS, SEVERITY_NODE_COLORS
 
 # 关系类型对应的边样式
 RELATION_EDGE_STYLES: dict[str, dict] = {
-    "矛盾": {"stroke": "#e53935", "strokeWidth": 2},
-    "依赖": {"stroke": "#1e88e5", "strokeWidth": 2},
-    "削弱": {"stroke": "#fb8c00", "strokeWidth": 2},
-    "配合": {"stroke": "#43a047", "strokeWidth": 2},
-    "递进": {"stroke": "#8e24aa", "strokeWidth": 2},
+    "矛盾": {"stroke": "#ff1744", "strokeWidth": 2},
+    "依赖": {"stroke": "#00e5ff", "strokeWidth": 2},
+    "削弱": {"stroke": "#ff9100", "strokeWidth": 2},
+    "配合": {"stroke": "#00e676", "strokeWidth": 2},
+    "递进": {"stroke": "#d500f9", "strokeWidth": 2},
 }
 
 
@@ -39,13 +39,16 @@ def render_topology(result: AnalysisResult) -> None:
                 source_position="right",
                 target_position="left",
                 style={
-                    "background": node_color,
+                    "background": f"linear-gradient(135deg, {node_color}, {node_color}dd)",
                     "color": "#fff",
-                    "border": f"2px solid {SEVERITY_COLORS.get(trap.severity, '#666')}",
-                    "borderRadius": "8px",
-                    "padding": "8px",
-                    "fontSize": "12px",
+                    "border": f"1px solid {SEVERITY_COLORS.get(trap.severity, 'rgba(0,229,255,0.2)')}",
+                    "borderRadius": "4px",
+                    "padding": "10px 12px",
+                    "fontSize": "11px",
+                    "fontFamily": "'Noto Sans SC', sans-serif",
                     "width": "160px",
+                    "boxShadow": f"0 4px 16px {node_color}44",
+                    "backdropFilter": "blur(8px)",
                 },
             )
         )
@@ -54,7 +57,7 @@ def render_topology(result: AnalysisResult) -> None:
     edges: list[StreamlitFlowEdge] = []
     for rel in result.relations:
         edge_style = RELATION_EDGE_STYLES.get(
-            rel.relation_type, {"stroke": "#999", "strokeWidth": 1}
+            rel.relation_type, {"stroke": "#5a6577", "strokeWidth": 1}
         )
         edges.append(
             StreamlitFlowEdge(
@@ -64,7 +67,10 @@ def render_topology(result: AnalysisResult) -> None:
                 animated=True,
                 label=rel.relation_type,
                 label_show_bg=True,
-                label_bg_style={"fill": "#f0f0f0"},
+                label_bg_style={
+                    "fill": "#0a0e18",
+                    "fillOpacity": "0.9",
+                },
                 style=edge_style,
                 marker_end={"type": "arrowclosed"},
             )
@@ -72,10 +78,9 @@ def render_topology(result: AnalysisResult) -> None:
 
     if not edges:
         st.info("各陷阱之间未发现跨段落的逻辑关联。")
-        # 仍然显示节点
         if len(nodes) == 1:
             st.markdown(
-                f"**检测到 1 个独立陷阱：** {result.traps[0].trap_type} - {result.traps[0].text[:50]}"
+                f"**检测到 1 个独立陷阱：** {result.traps[0].trap_type} — {result.traps[0].text[:50]}"
             )
             return
 
@@ -95,7 +100,11 @@ def render_topology(result: AnalysisResult) -> None:
         hide_watermark=True,
         get_node_on_click=True,
         get_edge_on_click=True,
-        style={"border": "1px solid #ddd", "borderRadius": "8px"},
+        style={
+            "border": "1px solid rgba(0, 229, 255, 0.1)",
+            "borderRadius": "4px",
+            "background": "#06080e",
+        },
     )
 
     # 点击节点显示详情
@@ -109,7 +118,6 @@ def render_topology(result: AnalysisResult) -> None:
                 st.markdown(f"**解析：** {trap.explanation}")
                 break
         else:
-            # 可能点击了边
             for rel in result.relations:
                 edge_id = f"{rel.source_id}-{rel.target_id}"
                 if edge_id == selected_id:
@@ -119,12 +127,15 @@ def render_topology(result: AnalysisResult) -> None:
 
     # 关系图例
     if edges:
-        st.markdown("---")
-        st.markdown("**关系类型图例：**")
-        legend_cols = st.columns(len(RELATION_EDGE_STYLES))
-        for col, (rtype, style) in zip(legend_cols, RELATION_EDGE_STYLES.items()):
-            col.markdown(
-                f'<span style="color:{style["stroke"]};font-weight:bold;">'
-                f"● {rtype}</span>",
-                unsafe_allow_html=True,
+        legend_parts = []
+        for rtype, style in RELATION_EDGE_STYLES.items():
+            legend_parts.append(
+                f'<div class="relation-legend-item">'
+                f'<span class="relation-legend-line" style="background:{style["stroke"]};"></span>'
+                f'{rtype}'
+                f'</div>'
             )
+        st.markdown(
+            f'<div class="relation-legend">{"".join(legend_parts)}</div>',
+            unsafe_allow_html=True,
+        )

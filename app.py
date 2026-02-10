@@ -18,24 +18,48 @@ def load_example(name: str) -> str:
 
 
 def get_risk_badge(level: str) -> str:
-    labels = {"high": "高风险", "medium": "中风险", "low": "低风险"}
+    labels = {"high": "HIGH RISK", "medium": "MED RISK", "low": "LOW RISK"}
+    cn_labels = {"high": "高风险", "medium": "中风险", "low": "低风险"}
     label = labels.get(level, level)
-    return f'<span class="risk-badge risk-{level}">{label}</span>'
+    cn = cn_labels.get(level, "")
+    return (
+        f'<span class="risk-badge risk-{level}">'
+        f'{label}<span style="margin-left:6px;font-size:0.7em;opacity:0.8;">{cn}</span>'
+        f'</span>'
+    )
 
 
 def main() -> None:
     st.set_page_config(
-        page_title="逻辑陷阱透视镜",
-        page_icon="🔍",
+        page_title="TrapDetect — 逻辑陷阱透视镜",
+        page_icon="⬡",
         layout="wide",
     )
     st.markdown(PAGE_CSS, unsafe_allow_html=True)
 
     # ── 侧边栏 ──
     with st.sidebar:
-        st.title("⚙️ 设置")
+        st.markdown(
+            '<div style="padding:0.5rem 0 0.3rem;">'
+            '<span style="font-family:JetBrains Mono,monospace;font-size:0.7rem;'
+            'color:#00e5ff;letter-spacing:0.15em;text-transform:uppercase;">'
+            'TrapDetect</span>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div class="scan-line" style="margin:0.6rem 0 1.2rem;"></div>',
+            unsafe_allow_html=True,
+        )
 
         # API Key 配置
+        st.markdown(
+            '<p style="font-family:JetBrains Mono,monospace;font-size:0.6rem;'
+            'color:#3a4557;letter-spacing:0.12em;text-transform:uppercase;'
+            'margin-bottom:0.3rem;">Configuration</p>',
+            unsafe_allow_html=True,
+        )
         env_key = os.environ.get("GEMINI_API_KEY", "")
         api_key = st.text_input(
             "Gemini API Key",
@@ -44,41 +68,66 @@ def main() -> None:
             help="优先读取环境变量 GEMINI_API_KEY，也可在此直接输入",
         )
 
-        st.divider()
+        st.markdown(
+            '<div class="scan-line" style="margin:1rem 0;"></div>',
+            unsafe_allow_html=True,
+        )
 
         # 示例文本
-        st.subheader("📄 示例文本")
+        st.markdown(
+            '<p style="font-family:JetBrains Mono,monospace;font-size:0.6rem;'
+            'color:#3a4557;letter-spacing:0.12em;text-transform:uppercase;'
+            'margin-bottom:0.3rem;">Sample Data</p>',
+            unsafe_allow_html=True,
+        )
         examples = sorted(EXAMPLES_DIR.glob("*.txt")) if EXAMPLES_DIR.exists() else []
         example_names = [f.stem for f in examples]
         if example_names:
             selected_example = st.selectbox(
                 "选择示例",
-                options=["（不使用示例）"] + example_names,
+                options=["—"] + example_names,
+                label_visibility="collapsed",
             )
-            if selected_example != "（不使用示例）" and st.button("加载示例"):
+            if selected_example != "—" and st.button("LOAD", use_container_width=True):
                 st.session_state[TEXT_INPUT_KEY] = load_example(
                     f"{selected_example}.txt"
                 )
                 st.rerun()
 
-        st.divider()
-        st.caption("逻辑陷阱透视镜 v0.1.0")
-        st.caption("Powered by Gemini")
+        st.markdown(
+            '<div class="scan-line" style="margin:1rem 0;"></div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div style="padding-top:0.5rem;">'
+            '<span style="font-family:JetBrains Mono,monospace;font-size:0.55rem;'
+            'color:#2a3344;letter-spacing:0.1em;">v0.1.0 // Powered by Gemini</span>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
-    # ── 主内容区 ──
-    st.title("🔍 逻辑陷阱透视镜")
-    st.markdown("上传或粘贴文本（法律合同、营销文案、协议条款等），AI 将自动识别其中的逻辑陷阱和风险条款。")
+    # ── 主内容区：标题 ──
+    st.markdown(
+        '<div class="main-header">'
+        '<h1 class="main-title">'
+        '<span class="accent">⬡</span> 逻辑陷阱<span class="accent">透视镜</span>'
+        '</h1>'
+        '<p class="main-subtitle">'
+        '上传或粘贴文本 — AI 深度扫描逻辑陷阱、风险条款与欺骗性表述'
+        '</p>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
-    # 文本输入
+    # ── 输入区域 ──
     input_text = st.text_area(
         "待分析文本",
         value=st.session_state.get(TEXT_INPUT_KEY, ""),
-        height=250,
-        placeholder="在此粘贴待分析的文本...",
+        height=220,
+        placeholder="在此粘贴待分析的文本 — 法律合同、营销文案、协议条款...",
         key=TEXT_INPUT_KEY,
     )
 
-    # 文件上传
     uploaded = st.file_uploader(
         "或上传文本文件",
         type=["txt"],
@@ -91,7 +140,9 @@ def main() -> None:
     # 分析按钮
     col1, col2 = st.columns([1, 5])
     with col1:
-        analyze_btn = st.button("🚀 开始分析", type="primary", use_container_width=True)
+        analyze_btn = st.button(
+            "SCAN", type="primary", use_container_width=True
+        )
 
     if analyze_btn:
         if not api_key:
@@ -101,7 +152,7 @@ def main() -> None:
             st.warning("请先输入或上传待分析的文本。")
             return
 
-        with st.spinner("AI 正在深度分析文本中的逻辑陷阱..."):
+        with st.spinner("正在深度扫描文本中的逻辑陷阱..."):
             try:
                 result = analyze_text(input_text, api_key)
                 st.session_state["analysis_result"] = result
@@ -115,25 +166,44 @@ def main() -> None:
     analyzed_text: str | None = st.session_state.get("analyzed_text")
 
     if result and analyzed_text:
-        st.divider()
+        # 扫描线分隔
+        st.markdown('<div class="scan-line"></div>', unsafe_allow_html=True)
 
-        # 概览
+        # 概览仪表盘
         trap_count = len(result.traps)
         relation_count = len(result.relations)
 
-        col_a, col_b, col_c = st.columns(3)
-        col_a.metric("检测到的陷阱", f"{trap_count} 个")
-        col_b.metric("跨段落关联", f"{relation_count} 条")
-        col_c.markdown(
-            f"**整体风险等级：** {get_risk_badge(result.overall_risk)}",
+        st.markdown(
+            f'<div class="overview-panel">'
+            f'<div class="stat-card card-traps">'
+            f'<div class="stat-label">Traps Detected · 检测陷阱</div>'
+            f'<div class="stat-value val-traps">{trap_count}</div>'
+            f'</div>'
+            f'<div class="stat-card card-relations">'
+            f'<div class="stat-label">Cross References · 跨段关联</div>'
+            f'<div class="stat-value val-relations">{relation_count}</div>'
+            f'</div>'
+            f'<div class="stat-card card-risk">'
+            f'<div class="stat-label">Overall Risk · 整体风险</div>'
+            f'<div style="margin-top:0.3rem;">{get_risk_badge(result.overall_risk)}</div>'
+            f'</div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
         # 总结
-        st.info(f"📋 **分析总结：** {result.summary}")
+        st.markdown(
+            f'<div class="summary-card">'
+            f'<span class="summary-label">Analysis Summary · 分析总结</span>'
+            f'{result.summary}'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
 
         # Tab 切换
-        tab_highlight, tab_topology = st.tabs(["📝 智能高亮", "🕸️ 风险拓扑图"])
+        tab_highlight, tab_topology = st.tabs(
+            ["HIGHLIGHT · 智能高亮", "TOPOLOGY · 风险拓扑"]
+        )
 
         with tab_highlight:
             render_highlighted_text(analyzed_text, result)
@@ -143,13 +213,18 @@ def main() -> None:
 
         # 详细分析列表
         if result.traps:
-            st.divider()
-            st.subheader("📊 陷阱详细解析")
+            st.markdown('<div class="scan-line"></div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="trap-detail-section">'
+                '<h3>Trap Analysis · 陷阱详细解析</h3>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
             for trap in result.traps:
-                severity_emoji = {"high": "🔴", "medium": "🟠", "low": "🟡"}.get(
-                    trap.severity, "⚪"
+                severity_icon = {"high": "▲", "medium": "◆", "low": "●"}.get(
+                    trap.severity, "○"
                 )
-                label = f'{severity_emoji} {trap.trap_type} — \u201c{trap.text[:40]}...\u201d'
+                label = f'{severity_icon} {trap.trap_type} — "{trap.text[:40]}..."'
                 with st.expander(label):
                     st.markdown(f"**原文片段：**\n> {trap.text}")
                     st.markdown(f"**类型：** {trap.trap_type}")

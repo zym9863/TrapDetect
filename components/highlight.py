@@ -61,15 +61,18 @@ def render_highlighted_text(text: str, result: AnalysisResult) -> None:
     )
 
     # 图例
-    st.markdown("---")
-    cols = st.columns(3)
-    for col, (level, label) in zip(
-        cols,
-        [("high", "高风险"), ("medium", "中风险"), ("low", "低风险")],
-    ):
-        color = SEVERITY_COLORS[level]
-        col.markdown(
-            f'<span style="background-color:{color};padding:2px 10px;'
-            f'border-radius:3px;font-size:0.85em;">{label}</span>',
-            unsafe_allow_html=True,
+    legend_items = [
+        ("high", "High Risk · 高风险", "#ff1744"),
+        ("medium", "Med Risk · 中风险", "#ff9100"),
+        ("low", "Low Risk · 低风险", "#ffd600"),
+    ]
+    legend_html = '<div class="highlight-legend">'
+    for level, label, color in legend_items:
+        legend_html += (
+            f'<div class="legend-item">'
+            f'<span class="legend-dot" style="background:{color};color:{color};"></span>'
+            f'{label}'
+            f'</div>'
         )
+    legend_html += '</div>'
+    st.markdown(legend_html, unsafe_allow_html=True)
